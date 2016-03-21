@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Chess Algo</title>
+	<script src="file:///D:/js/chess/jquery-1.11.0.min.js"></script>
+</head>
+<body>
+	<div class="wrapper">
+		<div class="title">Chess Algo</div>
+		<div class="wrap">
+			<div class="left">
+				<!-- <div>
+					Easy 	<input onclick="fnChangeLevel(1);" name="gamelevel" type="radio" value="easy"><br />
+					Medium 	<input onclick="fnChangeLevel(2);" name="gamelevel" type="radio" value="medium"><br />
+					Hard 	<input onclick="fnChangeLevel(3);" name="gamelevel" type="radio" value="hard"><br />
+				</div> -->
+				<!-- <div>
+					<br /><br />
+					Score : <span id="score"></span>
+					<br /><br />
+					<span id="over">Game Over</span>
+				</div> -->
+			</div>
+			
+			<div class="right main"></div>
+		</div>
+	</div>
+	<style>
+		.wrap
+		{
+			margin: 50px 0;
+		}
+		input[type="radio"]
+		{
+			float: right;
+			margin-right: 130px; 
+		}
+		input[type="text"]
+		{
+			width: 30px;
+			height: 30px;
+			border: none;
+			margin: 4px;
+			text-align: center;
+		}
+		.title
+		{
+			text-align: center;
+			font-size: 30px;
+			font-weight: 600;
+			font-family: cursive;
+			/*display: none;*/
+		}
+		.left
+		{
+			width: 30%;
+			float: left;
+		}
+		.right
+		{
+			width: 70%;
+			float: right;
+		}
+		.wrapper
+		{
+			margin: 0 auto;
+			width:700px;
+		}
+		table,tr 
+		{
+			border:1px solid red;
+		}
+		td
+		{
+			border: 1px dashed salmon;
+		}
+		.bg-red {
+			background-color: red !important;
+		}
+		.pad
+		{
+			padding: 10px 15px;
+		}
+		.borderbottom > td 
+		{
+			/*border-bottom: 2px solid red;*/
+		}
+		.borderleft
+		{
+			border-left: 2px solid red;
+		}
+	</style>
+	<script>
+		/******************************************************
+	    *	Author 			: 	Rohan Lopes
+	    *	Last Modified 	: 	10-July-2015 11:11 AM
+	    *******************************************************/
+
+	    var gameLevel = 12;
+
+	    $( document ).ready(function() {
+	  		fnChess();
+			var x = 1; 
+			var y = 1;
+			
+			rePaint();
+			
+			startHorse = setInterval(function (){
+				if(x <=8 && y <=8) {
+					fnMoveHorse(x, y);
+					// rePaint();
+					// 
+					console.log(x, y);
+					x ++;
+					if(x == 8 && y == 8){
+						x = 1;
+						y = 1;
+					} else if(x == 9) {
+						x = 1;
+						y++;
+					}
+				}
+
+			}, 1000);  	
+
+	    });
+
+		//generate blank object for sudoku
+		function genBlankObj() {
+			try {
+				for (var i = 1; i <=8; i++) {
+					for (var j = 1; j<= 8; j++) {
+						objChessVals['rc'+j+''+i+''] = { j , i , 'Val' : ''};
+					}
+				}
+			} catch (e) {
+				console.error(e);
+			}
+		}
+
+
+
+		function fnPossibleMoves(obj){
+			try{
+				var x = obj.x;
+				var y = obj.y;
+				$('tr > td[row-col]').removeClass('bg-red');
+		     	var arrPosMoves = [];
+	   			if ((obj.x + 2) > 0 && (obj.x + 2) <=8) {
+					if ((obj.y - 1) > 0 && (obj.y - 1) <=8) {
+		          		arrPosMoves.push({'pos':'right-top','x':(obj.x + 2), 'y':(obj.y - 1)});
+		          		objChessVals['rc' + ( x + 1 ) + '' + y].Val = 'x';
+		          		objChessVals['rc' + ( x + 2 ) + '' + y].Val = 'x';
+		          		//red map
+		          		$('tr > td[row-col=' + x + '' + y+ ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + ( x + 1 ) + '' + y + ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + ( x + 2 ) + '' + y + ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + ( x + 2 ) + '' + ( y-1 ) + ']').addClass('bg-red');
+					}
+					if((obj.y + 1) > 0 && (obj.y + 1) <=8) {
+		          		arrPosMoves.push({'pos':'right-bottom','x':(obj.x + 2), 'y':(obj.y + 1)});
+		          		objChessVals['rc' + ( x + 1 ) + '' + y].Val = 'x';
+		          		objChessVals['rc' + ( x + 2 ) + '' + y].Val = 'x';
+		          		//red map
+		          		$('tr > td[row-col=' + x + '' + y+ ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + ( x + 1 ) + '' + y + ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + ( x + 2 ) + '' + y + ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + ( x + 2 ) + '' + ( y+1 ) + ']').addClass('bg-red');
+					}
+				}
+				if((obj.y + 2) > 0 && (obj.y + 2) <=8) {
+	          		if ((obj.x - 1) > 0 && (obj.x - 1) <=8) {
+		          		arrPosMoves.push({'pos':'bottom-left','x':(obj.x - 1), 'y':(obj.y + 2)});
+		          		objChessVals['rc' + x + '' + ( y + 1)].Val = 'x';
+		          		objChessVals['rc' + x + '' + ( y + 2)].Val = 'x';
+		          		//red map
+		          		$('tr > td[row-col=' + x + '' + y+ ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + x + '' + ( y + 1 ) + ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + x + '' + ( y + 2 ) + ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + ( x - 1 ) + '' + ( y + 2 ) + ']').addClass('bg-red');
+					}
+					if((obj.x + 1) > 0 && (obj.x + 1) <=8) {
+		          		arrPosMoves.push({'pos':'bottom-right','x':(obj.x + 1), 'y':(obj.y + 2)});
+		          		objChessVals['rc' + x + '' + ( y + 1)].Val = 'x';
+		          		objChessVals['rc' + x + '' + ( y + 2)].Val = 'x';
+		          		//red map
+		          		$('tr > td[row-col=' + x + '' + y+ ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + x + '' + ( y + 1 ) + ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + x + '' + ( y + 2 ) + ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + ( x + 1 ) + '' + ( y + 2 ) + ']').addClass('bg-red');
+					}
+				} 
+				if ((obj.x - 2) > 0) {
+	          		if ((obj.y - 1) > 0 && (obj.y - 1) <=8) {
+		          		arrPosMoves.push({'pos':'left-top','x':(obj.x - 2), 'y':(obj.y - 1)});
+		          		objChessVals['rc' + ( x - 1 ) + '' + y].Val = 'x';
+		          		objChessVals['rc' + ( x - 2 ) + '' + y].Val = 'x';
+		          		//red map
+		          		$('tr > td[row-col=' + x + '' + y+ ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + ( x - 1 ) + '' + y + ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + ( x - 2 ) + '' + y + ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + ( x - 2 ) + '' + ( y-1 ) + ']').addClass('bg-red');
+					}
+					if((obj.y + 1) > 0  && (obj.y + 1) <=8) {
+		          		arrPosMoves.push({'pos':'left-bottom','x':(obj.x - 2), 'y':(obj.y + 1)});
+		          		objChessVals['rc' + ( x - 1 ) + '' + y].Val = 'x';
+		          		objChessVals['rc' + ( x - 2 ) + '' + y].Val = 'x';
+		          		//red map
+		          		$('tr > td[row-col=' + x + '' + y+ ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + ( x - 1 ) + '' + y + ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + ( x - 2 ) + '' + y + ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + ( x - 2 ) + '' + ( y + 1 ) + ']').addClass('bg-red');
+					}
+				}
+				if ((obj.y - 2) > 0) {
+	          		if ((obj.x - 1) > 0 && (obj.x - 1) <=8) {
+		          		arrPosMoves.push({'pos':'top-left','x':(obj.x - 1), 'y':(obj.y - 2)});
+		          		objChessVals['rc' + x + '' + ( y - 1)].Val = 'x';
+		          		objChessVals['rc' + x + '' + ( y - 2)].Val = 'x';
+		          		//red map
+		          		$('tr > td[row-col=' + x + '' + y+ ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + x + '' + ( y - 1 ) + ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + x + '' + ( y - 2 ) + ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + ( x - 1 ) + '' + ( y - 2 ) + ']').addClass('bg-red');
+					}
+					if ((obj.x + 1) > 0 && (obj.x + 1) <=8) {
+		          		arrPosMoves.push({'pos':'top-right','x':(obj.x + 1), 'y':(obj.y - 2)});
+		          		objChessVals['rc' + x + '' + ( y - 1)].Val = 'x';
+		          		objChessVals['rc' + x + '' + ( y - 2)].Val = 'x';
+		          		//red map
+		          		$('tr > td[row-col=' + x + '' + y+ ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + x + '' + ( y - 1 ) + ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + x + '' + ( y - 2 ) + ']').addClass('bg-red');
+		          		$('tr > td[row-col=' + ( x + 1 ) + '' + ( y - 2 ) + ']').addClass('bg-red');
+					}
+				}
+		   	 	return arrPosMoves;
+			}catch(e){
+				console.error(e);
+			}
+		}
+
+		function fnMoveHorse(x, y){
+			try{
+				genBlankObj();
+				var arr = fnPossibleMoves({'x': x, 'y': y});
+				objChessVals['rc' + x + '' + y].Val = 'X' + x +''+ y;	 
+		  		for (var l = 0; l < arr.length; l++) {			
+	  				objChessVals['rc' + arr[l].x + '' + arr[l].y].Val = 'H';	
+	  			}
+	  			rePaint();
+
+			}catch(e){
+				console.error(e);
+			}
+		}
+
+		//main chess algorithm 
+		function fnChess() {
+			try {
+				objChessVals = {};
+				var cluster;
+				//generate 9 clusters
+				genBlankObj();
+				
+			} catch (e) {
+				console.error(e);
+			}
+		}
+
+		//paint function
+		function rePaint(){
+			try {
+				displaytxt 	= "<table border=\"1\">";
+				var arrNum = [1, 2, 3, 4, 5, 6, 7, 8];
+
+				for (var i=1;i<=8;i++) {
+					if(i==3 || i==6) {
+						displaytxt += "<tr class='borderbottom'>";
+					} else {
+						displaytxt += "<tr>";
+					}
+					for (var j=1;j<=8;j++) {
+						displaytxt += "<td class='' row-col='"+ objChessVals['rc'+j+''+i].j+""+objChessVals['rc'+j+''+i].i+ "' data-sudoku-val='"+ objChessVals['rc'+j+''+i].Val+ "'><input type=\"text\" data-sudoku-val='"+ objChessVals['rc'+j+''+i].Val+"' value='"+ objChessVals['rc'+j+''+i].Val+"'/></td>";
+
+					}
+					displaytxt += "</tr>";
+				}
+				displaytxt += "</table>";
+				$('.main').html(displaytxt);
+			} catch (e) {
+				console.error(e);
+			}
+		}
+
+
+	</script>
+</body>
+</html>
